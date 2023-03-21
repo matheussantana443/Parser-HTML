@@ -2,8 +2,10 @@
 
 read -p "Digite a URL que deseja analisar: " url
 
-curl -s "$url" | sed -n 's/.*<a href="\([^"]*\)".*/\1/p' | while read link; do
-    subdomain=$(echo "$link" | sed -n 's/https\?:\/\/\([^\/]*\).*/\1/p')
-    ip=$(host "$subdomain" | sed -n 's/.*has address \([^ ]*\).*/\1/p')
-    echo "Link: $link IP: $ip"
-done
+links=$(curl -sL "$url" |grep -Eo "https?:\/\/([^\/]*)" | sort -u)
+for link in $links; do
+i=$(echo $link | sed -E "s/https?:\/\///g")
+echo "$link ($(dig +short $i | head -n1))"
+done 
+
+
